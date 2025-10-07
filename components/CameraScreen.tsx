@@ -33,19 +33,17 @@ export function CameraScreen({ onImageCaptured }: CameraScreenProps) {
   } = useCamera();
 
   const handleTakePicture = async () => {
-    await takePicture();
-    if (cameraRef.current) {
-      const photo = await cameraRef.current.takePictureAsync({
-        quality: 0.8,
-      });
-      if (photo) {
-        onImageCaptured(photo.uri);
-      }
+    const imageUri = await takePicture();
+    if (imageUri) {
+      onImageCaptured(imageUri);
     }
   };
 
   const handleSelectFromGallery = async () => {
-    await selectFromGallery();
+    const imageUri = await selectFromGallery();
+    if (imageUri) {
+      onImageCaptured(imageUri);
+    }
   };
 
   if (!permission) {
@@ -161,6 +159,17 @@ const styles = StyleSheet.create({
   camera: {
     flex: 1,
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#666',
+    marginTop: 16,
+  },
   permissionContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -182,14 +191,39 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     lineHeight: 24,
   },
+  permissionButtons: {
+    gap: 16,
+    width: '100%',
+  },
   permissionButton: {
     backgroundColor: '#2196F3',
     paddingHorizontal: 30,
     paddingVertical: 15,
     borderRadius: 25,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
   },
   permissionButtonText: {
     color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  galleryOnlyButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+    borderColor: '#2196F3',
+    paddingHorizontal: 30,
+    paddingVertical: 15,
+    borderRadius: 25,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  galleryOnlyButtonText: {
+    color: '#2196F3',
     fontSize: 16,
     fontWeight: 'bold',
   },
