@@ -142,7 +142,7 @@ export function AnalysisResults({
 
           {/* Nutritional Info */}
           {renderSection(
-            'Nutritional Information',
+            'Complete Nutritional Information',
             'restaurant',
             <View style={styles.nutritionGrid}>
               <View style={styles.nutritionItem}>
@@ -158,16 +158,40 @@ export function AnalysisResults({
                 <Text style={styles.nutritionValue}>{analysis.nutritionalInfo.carbs}</Text>
               </View>
               <View style={styles.nutritionItem}>
-                <Text style={styles.nutritionLabel}>Fat</Text>
+                <Text style={styles.nutritionLabel}>Total Fat</Text>
                 <Text style={styles.nutritionValue}>{analysis.nutritionalInfo.fat}</Text>
+              </View>
+              <View style={styles.nutritionItem}>
+                <Text style={styles.nutritionLabel}>Saturated Fat</Text>
+                <Text style={styles.nutritionValue}>{analysis.nutritionalInfo.saturatedFat}</Text>
               </View>
               <View style={styles.nutritionItem}>
                 <Text style={styles.nutritionLabel}>Fiber</Text>
                 <Text style={styles.nutritionValue}>{analysis.nutritionalInfo.fiber}</Text>
               </View>
               <View style={styles.nutritionItem}>
+                <Text style={styles.nutritionLabel}>Sugar</Text>
+                <Text style={styles.nutritionValue}>{analysis.nutritionalInfo.sugar}</Text>
+              </View>
+              <View style={styles.nutritionItem}>
                 <Text style={styles.nutritionLabel}>Sodium</Text>
                 <Text style={styles.nutritionValue}>{analysis.nutritionalInfo.sodium}</Text>
+              </View>
+              <View style={styles.nutritionItem}>
+                <Text style={styles.nutritionLabel}>Cholesterol</Text>
+                <Text style={styles.nutritionValue}>{analysis.nutritionalInfo.cholesterol}</Text>
+              </View>
+              <View style={styles.nutritionItem}>
+                <Text style={styles.nutritionLabel}>Vitamin C</Text>
+                <Text style={styles.nutritionValue}>{analysis.nutritionalInfo.vitaminC}</Text>
+              </View>
+              <View style={styles.nutritionItem}>
+                <Text style={styles.nutritionLabel}>Calcium</Text>
+                <Text style={styles.nutritionValue}>{analysis.nutritionalInfo.calcium}</Text>
+              </View>
+              <View style={styles.nutritionItem}>
+                <Text style={styles.nutritionLabel}>Iron</Text>
+                <Text style={styles.nutritionValue}>{analysis.nutritionalInfo.iron}</Text>
               </View>
             </View>
           )}
@@ -240,7 +264,7 @@ export function AnalysisResults({
 
           {/* Storage Info */}
           {renderSection(
-            'Storage & Expiry',
+            'Storage & Expiry Information',
             'inventory',
             <View>
               <View style={styles.storageItem}>
@@ -252,6 +276,32 @@ export function AnalysisResults({
                 <Text style={styles.storageText}>{analysis.expiryInfo}</Text>
               </View>
             </View>
+          )}
+
+          {/* Similar Products Recommendations */}
+          {analysis.similarProducts && analysis.similarProducts.length > 0 && renderSection(
+            'Healthier Alternatives',
+            'recommend',
+            <View>
+              {analysis.similarProducts.map((product, index) => (
+                <View key={index} style={styles.similarProductItem}>
+                  <View style={styles.similarProductHeader}>
+                    <Text style={styles.similarProductName}>{product.name}</Text>
+                    <View style={[styles.ratingBadge, { 
+                      backgroundColor: getHealthRatingColor(product.healthRating) 
+                    }]}>
+                      <Text style={styles.ratingBadgeText}>{product.healthRating}</Text>
+                    </View>
+                  </View>
+                  <Text style={styles.similarProductBrand}>Brand: {product.brand}</Text>
+                  <View style={styles.benefitContainer}>
+                    <MaterialIcons name="star" size={16} color="#4CAF50" />
+                    <Text style={styles.similarProductBenefit}>{product.keyBenefit}</Text>
+                  </View>
+                </View>
+              ))}
+            </View>,
+            '#FF6B35'
           )}
         </View>
       </ScrollView>
@@ -427,7 +477,8 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',
-    minWidth: (width - 80) / 3 - 8,
+    minWidth: (width - 80) / 2 - 8,
+    flex: 1,
   },
   nutritionLabel: {
     fontSize: 12,
@@ -483,6 +534,53 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
     marginTop: 4,
+  },
+  similarProductItem: {
+    backgroundColor: '#f8f9fa',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+    borderLeftWidth: 4,
+    borderLeftColor: '#FF6B35',
+  },
+  similarProductHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  similarProductName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+    flex: 1,
+    marginRight: 8,
+  },
+  ratingBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  ratingBadgeText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  similarProductBrand: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 8,
+  },
+  benefitContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  similarProductBenefit: {
+    fontSize: 14,
+    color: '#4CAF50',
+    marginLeft: 6,
+    flex: 1,
+    fontWeight: '500',
   },
   bottomControls: {
     paddingHorizontal: 20,

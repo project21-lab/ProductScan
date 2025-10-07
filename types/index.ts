@@ -11,6 +11,14 @@ export interface ProductAnalysis {
   concerns: string[];
   storageInstructions: string;
   expiryInfo: string;
+  similarProducts: SimilarProduct[];
+}
+
+export interface SimilarProduct {
+  name: string;
+  brand: string;
+  healthRating: string;
+  keyBenefit: string;
 }
 
 export interface Chemical {
@@ -26,6 +34,12 @@ export interface NutritionalInfo {
   fat: string;
   fiber: string;
   sodium: string;
+  sugar: string;
+  saturatedFat: string;
+  cholesterol: string;
+  vitaminC: string;
+  calcium: string;
+  iron: string;
 }
 
 export interface CapturedImage {

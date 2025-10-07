@@ -12,34 +12,56 @@ export const Config = {
   SUPPORTED_FORMATS: ['jpg', 'jpeg', 'png'],
   
   // Analysis prompt template
-  ANALYSIS_PROMPT: `Analyze this product image and provide detailed information in the following JSON format:
+  ANALYSIS_PROMPT: `You are an expert food scientist and nutritionist. Analyze this product image thoroughly and provide comprehensive information in the following JSON format. Be very detailed and accurate:
+
 {
-  "productName": "Product name",
-  "brand": "Brand name",
-  "category": "Product category",
-  "ingredients": ["ingredient1", "ingredient2"],
+  "productName": "Exact product name from package",
+  "brand": "Brand name from package",
+  "category": "Food category (e.g., Snack Food, Beverage, Dairy)",
+  "ingredients": ["List ALL ingredients in order as shown on package"],
   "chemicals": [
     {
-      "name": "Chemical name",
-      "purpose": "Purpose in product",
-      "safety": "Safety information"
+      "name": "Chemical/Additive name (E-numbers, preservatives, etc.)",
+      "purpose": "What it does in the product",
+      "safety": "Safety profile and potential effects"
     }
   ],
   "nutritionalInfo": {
-    "calories": "per serving",
-    "protein": "amount",
-    "carbs": "amount",
-    "fat": "amount",
-    "fiber": "amount",
-    "sodium": "amount"
+    "calories": "per serving with unit",
+    "protein": "amount with unit",
+    "carbs": "amount with unit",
+    "fat": "amount with unit",
+    "fiber": "amount with unit",
+    "sodium": "amount with unit",
+    "sugar": "amount with unit",
+    "saturatedFat": "amount with unit",
+    "cholesterol": "amount with unit",
+    "vitaminC": "amount with unit or N/A",
+    "calcium": "amount with unit or N/A",
+    "iron": "amount with unit or N/A"
   },
-  "allergens": ["allergen1", "allergen2"],
-  "healthRating": "Rating out of 10",
-  "benefits": ["benefit1", "benefit2"],
-  "concerns": ["concern1", "concern2"],
-  "storageInstructions": "How to store",
-  "expiryInfo": "Expiry details if visible"
+  "allergens": ["All allergens and 'may contain' warnings"],
+  "healthRating": "X/10 (numeric rating)",
+  "benefits": ["Detailed health benefits and positive aspects"],
+  "concerns": ["Health concerns, high sodium/sugar, artificial additives, etc."],
+  "storageInstructions": "Storage instructions from package",
+  "expiryInfo": "Expiry date if visible, or general shelf life info",
+  "similarProducts": [
+    {
+      "name": "Similar healthier product name",
+      "brand": "Brand of similar product",
+      "healthRating": "X/10",
+      "keyBenefit": "Main advantage over current product"
+    }
+  ]
 }
 
-Provide accurate, detailed analysis based on visible text and ingredients on the package.`
+IMPORTANT:
+- Read ALL visible text on the package carefully
+- Include complete ingredient lists
+- Identify all chemical additives and preservatives
+- Provide realistic health ratings based on ingredients
+- Suggest 3-5 similar but healthier alternatives
+- Be thorough with nutritional analysis
+- Only return valid JSON, no markdown formatting`
 };

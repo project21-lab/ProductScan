@@ -23,40 +23,98 @@ export class GeminiService {
   static async analyzeProduct(imageUri: string): Promise<AnalysisResult> {
     try {
       if (Config.GEMINI_API_KEY === 'your-gemini-api-key-here') {
-        // Return mock data for demo purposes
+        // Return enhanced mock data for demo purposes
         return {
           success: true,
           data: {
-            productName: "Demo Biscuit Pack",
-            brand: "Sample Brand",
-            category: "Snack Food",
-            ingredients: ["Wheat Flour", "Sugar", "Vegetable Oil", "Salt", "Baking Powder"],
+            productName: "Cream Filled Chocolate Biscuits",
+            brand: "Demo Foods",
+            category: "Snack Food - Cookies & Biscuits",
+            ingredients: [
+              "Wheat Flour", "Sugar", "Vegetable Oil (Palm)", "Cocoa Powder", 
+              "Milk Powder", "Salt", "Baking Powder", "Artificial Vanilla Flavoring", 
+              "Soy Lecithin (E322)", "Sodium Bicarbonate (E500)", "Artificial Colors (E102, E110)"
+            ],
             chemicals: [
               {
-                name: "Sodium Bicarbonate",
-                purpose: "Leavening agent",
-                safety: "Generally safe, used in baking"
+                name: "Soy Lecithin (E322)",
+                purpose: "Emulsifier to bind ingredients and improve texture",
+                safety: "Generally safe, derived from soybeans, helps with mixing"
               },
               {
-                name: "Lecithin",
-                purpose: "Emulsifier",
-                safety: "Safe food additive, improves texture"
+                name: "Sodium Bicarbonate (E500)",
+                purpose: "Leavening agent for light texture",
+                safety: "Safe baking soda, commonly used in food production"
+              },
+              {
+                name: "Artificial Colors (E102, E110)",
+                purpose: "Food coloring for visual appeal",
+                safety: "May cause hyperactivity in children, avoid if sensitive"
+              },
+              {
+                name: "Palm Oil",
+                purpose: "Fat source for texture and shelf life",
+                safety: "High in saturated fat, environmental concerns"
               }
             ],
             nutritionalInfo: {
-              calories: "150 per serving",
-              protein: "3g",
+              calories: "150 per 30g serving",
+              protein: "2.5g",
               carbs: "20g",
               fat: "7g",
               fiber: "1g",
-              sodium: "200mg"
+              sodium: "180mg",
+              sugar: "8g",
+              saturatedFat: "3.5g",
+              cholesterol: "5mg",
+              vitaminC: "N/A",
+              calcium: "20mg",
+              iron: "1.2mg"
             },
-            allergens: ["Wheat", "May contain nuts"],
-            healthRating: "6/10",
-            benefits: ["Source of carbohydrates", "Convenient snack"],
-            concerns: ["High in saturated fat", "Contains processed ingredients"],
-            storageInstructions: "Store in cool, dry place",
-            expiryInfo: "Check package for best before date"
+            allergens: ["Contains: Wheat, Milk, Soy", "May contain: Nuts, Eggs"],
+            healthRating: "4/10",
+            benefits: [
+              "Quick energy source from carbohydrates",
+              "Contains some iron for blood health",
+              "Convenient portable snack",
+              "Provides immediate glucose for brain function"
+            ],
+            concerns: [
+              "High in saturated fat (3.5g per serving)",
+              "Contains artificial colors that may affect children",
+              "High sugar content (8g per serving)",
+              "Palm oil has environmental impact",
+              "Processed ingredients with minimal nutritional value",
+              "High calorie density for small serving size"
+            ],
+            storageInstructions: "Store in cool, dry place below 25°C. Keep away from direct sunlight.",
+            expiryInfo: "Best before 12 months from manufacture date. Check package for exact date.",
+            similarProducts: [
+              {
+                name: "Oat & Honey Digestive Biscuits",
+                brand: "Healthy Choice",
+                healthRating: "7/10",
+                keyBenefit: "Higher fiber content and no artificial colors"
+              },
+              {
+                name: "Dark Chocolate Rice Cakes",
+                brand: "Nature's Own",
+                healthRating: "8/10",
+                keyBenefit: "Lower calories and antioxidants from dark chocolate"
+              },
+              {
+                name: "Whole Grain Crackers",
+                brand: "Wholesome",
+                healthRating: "7/10",
+                keyBenefit: "More fiber and protein, less sugar"
+              },
+              {
+                name: "Almond & Date Energy Balls",
+                brand: "Pure Snacks",
+                healthRating: "9/10",
+                keyBenefit: "Natural ingredients, healthy fats, no artificial additives"
+              }
+            ]
           }
         };
       }
@@ -91,7 +149,9 @@ export class GeminiService {
       );
 
       if (!response.ok) {
-        throw new Error(`Gemini API error: ${response.status}`);
+        const errorData = await response.text();
+        console.error('Gemini API Error Response:', errorData);
+        throw new Error(`Gemini API error ${response.status}: ${errorData}`);
       }
 
       const result = await response.json();
@@ -101,13 +161,31 @@ export class GeminiService {
         throw new Error('No response from Gemini API');
       }
 
-      // Extract JSON from response (handle markdown code blocks)
-      const jsonMatch = textResponse.match(/\{[\s\S]*\}/);
+      // Extract JSON from response (handle markdown code blocks and clean response)
+      let cleanResponse = textResponse.trim();
+      
+      // Remove markdown code blocks if present
+      if (cleanResponse.startsWith('```json')) {
+        cleanResponse = cleanResponse.replace(/```json\n?/, '').replace(/\n?```$/, '');
+      } else if (cleanResponse.startsWith('```')) {
+        cleanResponse = cleanResponse.replace(/```\n?/, '').replace(/\n?```$/, '');
+      }
+      
+      // Find JSON object
+      const jsonMatch = cleanResponse.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
-        throw new Error('Invalid JSON response from API');
+        console.error('No JSON found in response:', textResponse);
+        throw new Error('Invalid JSON response from API. Response: ' + textResponse.substring(0, 200));
       }
 
-      const analysisData: ProductAnalysis = JSON.parse(jsonMatch[0]);
+      let analysisData: ProductAnalysis;
+      try {
+        analysisData = JSON.parse(jsonMatch[0]);
+      } catch (parseError) {
+        console.error('JSON parse error:', parseError);
+        console.error('Attempted to parse:', jsonMatch[0]);
+        throw new Error('Failed to parse API response as JSON');
+      }
       
       return {
         success: true,
