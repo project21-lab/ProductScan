@@ -7,7 +7,7 @@ import {
   Platform,
   Dimensions,
 } from 'react-native';
-import { Camera } from 'expo-camera';
+import { CameraView } from 'expo-camera';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -92,10 +92,10 @@ export function CameraScreen({ onImageCaptured }: CameraScreenProps) {
 
   return (
     <View style={styles.container}>
-      <Camera
+      <CameraView
         ref={cameraRef}
         style={styles.camera}
-        type={facing === 'front' ? Camera.Constants.Type.front : Camera.Constants.Type.back}
+        facing={facing}
       >
         {/* Header */}
         <LinearGradient
@@ -160,7 +160,7 @@ export function CameraScreen({ onImageCaptured }: CameraScreenProps) {
             </TouchableOpacity>
           </View>
         </LinearGradient>
-      </Camera>
+      </CameraView>
     </View>
   );
 }

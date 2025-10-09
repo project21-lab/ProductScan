@@ -1,15 +1,15 @@
 import { useState, useRef, useCallback } from 'react';
-import { Camera } from 'expo-camera';
+import { useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import { Platform, Alert } from 'react-native';
 import { CapturedImage } from '../types';
 
 export function useCamera() {
-  const [permission, requestPermission] = Camera.useCameraPermissions();
+  const [permission, requestPermission] = useCameraPermissions();
   const [facing, setFacing] = useState<'front' | 'back'>('back');
   const [capturedImage, setCapturedImage] = useState<CapturedImage | null>(null);
   const [isCapturing, setIsCapturing] = useState(false);
-  const cameraRef = useRef<Camera>(null);
+  const cameraRef = useRef<any>(null);
 
   const showAlert = useCallback((title: string, message: string) => {
     if (Platform.OS === 'web') {
