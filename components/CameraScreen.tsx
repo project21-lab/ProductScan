@@ -26,10 +26,13 @@ export function CameraScreen({ onImageCaptured }: CameraScreenProps) {
     requestPermission,
     facing,
     isCapturing,
+    isCameraReady,
     cameraRef,
     takePicture,
     selectFromGallery,
     toggleCameraFacing,
+    onCameraReady,
+    onCameraError,
   } = useCamera();
 
   const handleTakePicture = async () => {
@@ -52,11 +55,18 @@ export function CameraScreen({ onImageCaptured }: CameraScreenProps) {
         <MaterialIcons name="camera-alt" size={80} color="#2196F3" />
         <Text style={styles.permissionTitle}>Camera Access Required</Text>
         <Text style={styles.permissionText}>
-          ProductScan needs camera access to analyze your product images
+          ProductScan needs camera access to analyze your product images, or you can select from gallery
         </Text>
-        <TouchableOpacity style={styles.permissionButton} onPress={requestPermission}>
-          <Text style={styles.permissionButtonText}>Grant Permission</Text>
-        </TouchableOpacity>
+        <View style={styles.permissionButtons}>
+          <TouchableOpacity style={styles.permissionButton} onPress={requestPermission}>
+            <MaterialIcons name="camera" size={20} color="white" />
+            <Text style={styles.permissionButtonText}>Grant Camera Access</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.galleryOnlyButton} onPress={handleSelectFromGallery}>
+            <Ionicons name="images" size={20} color="#2196F3" />
+            <Text style={styles.galleryOnlyButtonText}>Use Gallery Only</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     );
   }
@@ -67,11 +77,18 @@ export function CameraScreen({ onImageCaptured }: CameraScreenProps) {
         <MaterialIcons name="camera-off" size={80} color="#f44336" />
         <Text style={styles.permissionTitle}>Camera Permission Denied</Text>
         <Text style={styles.permissionText}>
-          Please enable camera access in your device settings to use ProductScan
+          To analyze products, you can either enable camera access or select images from your gallery
         </Text>
-        <TouchableOpacity style={styles.permissionButton} onPress={requestPermission}>
-          <Text style={styles.permissionButtonText}>Try Again</Text>
-        </TouchableOpacity>
+        <View style={styles.permissionButtons}>
+          <TouchableOpacity style={styles.permissionButton} onPress={requestPermission}>
+            <MaterialIcons name="camera" size={20} color="white" />
+            <Text style={styles.permissionButtonText}>Enable Camera</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.galleryOnlyButton} onPress={handleSelectFromGallery}>
+            <Ionicons name="images" size={20} color="#2196F3" />
+            <Text style={styles.galleryOnlyButtonText}>Use Gallery Instead</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     );
   }
@@ -82,6 +99,8 @@ export function CameraScreen({ onImageCaptured }: CameraScreenProps) {
         ref={cameraRef}
         style={styles.camera}
         facing={facing}
+        onCameraReady={onCameraReady}
+        onMountError={onCameraError}
       >
         {/* Header */}
         <LinearGradient
@@ -124,13 +143,15 @@ export function CameraScreen({ onImageCaptured }: CameraScreenProps) {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.captureButton, isCapturing && styles.captureButtonDisabled]}
+              style={[styles.captureButton, (isCapturing || !isCameraReady) && styles.captureButtonDisabled]}
               onPress={handleTakePicture}
-              disabled={isCapturing}
+              disabled={isCapturing || !isCameraReady}
             >
               <View style={styles.captureButtonInner}>
                 {isCapturing ? (
                   <MaterialIcons name="hourglass-empty" size={32} color="#2196F3" />
+                ) : !isCameraReady ? (
+                  <MaterialIcons name="camera-enhance" size={32} color="#999" />
                 ) : (
                   <MaterialIcons name="camera" size={32} color="#2196F3" />
                 )}

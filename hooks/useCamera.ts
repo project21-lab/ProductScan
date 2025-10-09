@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import { Platform, Alert } from 'react-native';
@@ -9,6 +9,7 @@ export function useCamera() {
   const [facing, setFacing] = useState<CameraType>('back');
   const [capturedImage, setCapturedImage] = useState<CapturedImage | null>(null);
   const [isCapturing, setIsCapturing] = useState(false);
+  const [isCameraReady, setIsCameraReady] = useState(false);
   const cameraRef = useRef<CameraView>(null);
 
   const showAlert = useCallback((title: string, message: string) => {
@@ -20,18 +21,26 @@ export function useCamera() {
   }, []);
 
   const takePicture = useCallback(async (): Promise<string | null> => {
-    if (!cameraRef.current || isCapturing || !permission?.granted) {
+    if (!cameraRef.current || isCapturing || !permission?.granted || !isCameraReady) {
+      if (!isCameraReady) {
+        showAlert('Camera Not Ready', 'Please wait for the camera to initialize.');
+      }
       return null;
     }
 
     try {
       setIsCapturing(true);
+      
+      // Add a small delay to ensure camera is fully ready
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       const photo = await cameraRef.current.takePictureAsync({
         quality: 0.8,
         base64: false,
+        skipProcessing: false,
       });
 
-      if (photo) {
+      if (photo && photo.uri) {
         const imageData: CapturedImage = {
           uri: photo.uri,
           timestamp: Date.now(),
@@ -39,6 +48,8 @@ export function useCamera() {
         setCapturedImage(imageData);
         return photo.uri;
       }
+      
+      showAlert('Camera Error', 'Failed to capture image. Please try again.');
       return null;
     } catch (error) {
       console.error('Error taking picture:', error);
@@ -47,7 +58,7 @@ export function useCamera() {
     } finally {
       setIsCapturing(false);
     }
-  }, [isCapturing, permission?.granted, showAlert]);
+  }, [isCapturing, permission?.granted, isCameraReady, showAlert]);
 
   const selectFromGallery = useCallback(async (): Promise<string | null> => {
     try {
@@ -92,16 +103,29 @@ export function useCamera() {
     setFacing(current => (current === 'back' ? 'front' : 'back'));
   }, []);
 
+  const onCameraReady = useCallback(() => {
+    setIsCameraReady(true);
+  }, []);
+
+  const onCameraError = useCallback((error: any) => {
+    console.error('Camera error:', error);
+    setIsCameraReady(false);
+    showAlert('Camera Error', 'Camera initialization failed. Please try restarting the app.');
+  }, [showAlert]);
+
   return {
     permission,
     requestPermission,
     facing,
     capturedImage,
     isCapturing,
+    isCameraReady,
     cameraRef,
     takePicture,
     selectFromGallery,
     retakePicture,
     toggleCameraFacing,
+    onCameraReady,
+    onCameraError,
   };
 }
