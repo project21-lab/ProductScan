@@ -7,7 +7,7 @@ import {
   Platform,
   Dimensions,
 } from 'react-native';
-import { CameraView } from 'expo-camera';
+import { Camera } from 'expo-camera';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -26,13 +26,10 @@ export function CameraScreen({ onImageCaptured }: CameraScreenProps) {
     requestPermission,
     facing,
     isCapturing,
-    isCameraReady,
     cameraRef,
     takePicture,
     selectFromGallery,
     toggleCameraFacing,
-    onCameraReady,
-    onCameraError,
   } = useCamera();
 
   const handleTakePicture = async () => {
@@ -95,12 +92,10 @@ export function CameraScreen({ onImageCaptured }: CameraScreenProps) {
 
   return (
     <View style={styles.container}>
-      <CameraView
+      <Camera
         ref={cameraRef}
         style={styles.camera}
-        facing={facing}
-        onCameraReady={onCameraReady}
-        onMountError={onCameraError}
+        type={facing === 'front' ? Camera.Constants.Type.front : Camera.Constants.Type.back}
       >
         {/* Header */}
         <LinearGradient
@@ -143,15 +138,13 @@ export function CameraScreen({ onImageCaptured }: CameraScreenProps) {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.captureButton, (isCapturing || !isCameraReady) && styles.captureButtonDisabled]}
+              style={[styles.captureButton, isCapturing && styles.captureButtonDisabled]}
               onPress={handleTakePicture}
-              disabled={isCapturing || !isCameraReady}
+              disabled={isCapturing}
             >
               <View style={styles.captureButtonInner}>
                 {isCapturing ? (
                   <MaterialIcons name="hourglass-empty" size={32} color="#2196F3" />
-                ) : !isCameraReady ? (
-                  <MaterialIcons name="camera-enhance" size={32} color="#999" />
                 ) : (
                   <MaterialIcons name="camera" size={32} color="#2196F3" />
                 )}
@@ -167,7 +160,7 @@ export function CameraScreen({ onImageCaptured }: CameraScreenProps) {
             </TouchableOpacity>
           </View>
         </LinearGradient>
-      </CameraView>
+      </Camera>
     </View>
   );
 }
