@@ -51,13 +51,27 @@ export default function ProductScanApp() {
     if (!capturedImageUri) return;
     
     setAppState('analyzing');
-    await analyzeProduct(capturedImageUri);
     
-    if (error) {
-      showAlert('Analysis Failed', error);
+    try {
+      await analyzeProduct(capturedImageUri);
+      
+      // Wait for the hook state to update
+      setTimeout(() => {
+        if (error) {
+          console.error('Analysis error:', error);
+          showAlert('Analysis Failed', `Error: ${error}. Please try again with a clearer image.`);
+          setAppState('preview');
+        } else if (analysisResult) {
+          setAppState('results');
+        } else {
+          showAlert('Analysis Failed', 'No results received. Please try again.');
+          setAppState('preview');
+        }
+      }, 1000);
+    } catch (err) {
+      console.error('Process error:', err);
+      showAlert('Analysis Failed', 'Failed to analyze product. Please check your internet connection and try again.');
       setAppState('preview');
-    } else {
-      setAppState('results');
     }
   };
 
