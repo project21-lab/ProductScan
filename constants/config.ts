@@ -1,7 +1,7 @@
 // Configuration for ProductScan App
 export const Config = {
   // Add your Gemini API key here
-  GEMINI_API_KEY: 'your-gemini-api-key-here',
+  GEMINI_API_KEY: 'AIzaSyC1dGRt9UoEJMIfQDQ47DzajEFXqOa0dF0',
   
   // Gemini API settings
   GEMINI_MODEL: 'gemini-1.5-flash',
